@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import WebSocket from 'ws';
 
 let supabaseClient = null;
 let isConfigured = false;
@@ -6,9 +7,11 @@ let isConfigured = false;
 export const initSupabase = () => {
   const supabaseUrl = process.env.SUPABASE_URL || 'https://paoagkctoxjofhllitjd.supabase.co';
   const supabaseKey =
-    process.env.SUPABASE_KEY ||
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.SUPABASE_ANON_KEY;
+    (process.env.SUPABASE_SERVICE_ROLE_KEY && !process.env.SUPABASE_SERVICE_ROLE_KEY.includes('your_'))
+      ? process.env.SUPABASE_SERVICE_ROLE_KEY
+      : (process.env.SUPABASE_KEY && !process.env.SUPABASE_KEY.includes('your_'))
+      ? process.env.SUPABASE_KEY
+      : process.env.SUPABASE_ANON_KEY;
 
   if (!supabaseKey || supabaseKey.includes('your_supabase')) {
     console.log('ℹ️ Supabase URL configured:', supabaseUrl);
@@ -22,6 +25,9 @@ export const initSupabase = () => {
       auth: {
         persistSession: false,
         autoRefreshToken: false,
+      },
+      realtime: {
+        transport: WebSocket,
       },
     });
 
