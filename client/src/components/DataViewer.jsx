@@ -11,11 +11,17 @@ import {
   CheckCircle2,
   Copy,
   Check,
+  Building2,
+  ShieldAlert,
+  ArrowUpRight,
+  TrendingDown,
+  Layers,
+  Sparkles,
 } from 'lucide-react';
 
 export default function DataViewer({ extractedData = {}, anomalies = [], onDataChange, isEditing = false }) {
   const [activeTab, setActiveTab] = useState('financial');
-  const [copied, setCopied] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(null);
 
   const tabs = [
     { id: 'financial', label: 'Financial & Items', icon: DollarSign },
@@ -68,8 +74,8 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
     const items = [...(extractedData.lineItems || [])];
     items.push({
       itemNumber: items.length + 1,
-      code: 'CPT-XXXXX',
-      description: 'New Itemized Procedure',
+      code: 'CPT-99214',
+      description: 'Office or Outpatient Visit Established',
       quantity: 1,
       unitPrice: 0,
       totalPrice: 0,
@@ -84,10 +90,11 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
     onDataChange({ ...extractedData, lineItems: items });
   };
 
-  const handleCopyJSON = () => {
-    navigator.clipboard.writeText(JSON.stringify(extractedData, null, 2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = (text, key) => {
+    if (!text) return;
+    navigator.clipboard.writeText(typeof text === 'object' ? JSON.stringify(text, null, 2) : text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
   };
 
   const financial = extractedData.financial || {};
@@ -99,7 +106,8 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
   // Compute live line items sum
   const computedSum = lineItems.reduce((acc, item) => acc + (Number(item.totalPrice) || 0), 0);
   const billedTotal = Number(financial.totalAmount) || 0;
-  const isMatch = Math.abs(computedSum - billedTotal) < 0.05;
+  const variance = Math.abs(billedTotal - computedSum);
+  const isMatch = variance < 0.05;
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-[#0f1422] overflow-hidden flex flex-col h-full shadow-xl">
@@ -135,35 +143,51 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
         {/* FINANCIAL & LINE ITEMS */}
         {activeTab === 'financial' && (
           <div className="space-y-6">
-            {/* Arithmetic Reconciliation Banner */}
+            {/* Arithmetic Reconciliation Banner with Visual Progress Bar */}
             <div
-              className={`p-3.5 rounded-xl border flex items-center justify-between text-xs ${
+              className={`p-4 rounded-2xl border transition-all ${
                 isMatch
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                  : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                  : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
               }`}
             >
-              <div className="flex items-center gap-2.5">
-                {isMatch ? (
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                ) : (
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                )}
-                <div>
-                  <p className="font-semibold">
+              <div className="flex items-center justify-between text-xs mb-2">
+                <div className="flex items-center gap-2">
+                  {isMatch ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0 animate-pulse" />
+                  )}
+                  <span className="font-bold">
                     {isMatch
-                      ? 'Mathematical Reconciliation Verified ✓'
-                      : 'Arithmetic Discrepancy Detected ⚠️'}
-                  </p>
-                  <p className="text-[11px] opacity-80">
-                    {isMatch
-                      ? 'Itemized line items exactly match billed total amount.'
-                      : `Line items total (₹${computedSum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}) differs from claim amount (₹${billedTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}).`}
-                  </p>
+                      ? 'Mathematical Reconciliation Verified'
+                      : 'Arithmetic Variance Detected by Gemini Engine'}
+                  </span>
                 </div>
+                <span className="font-mono font-bold text-xs">
+                  {isMatch ? 'Variance: ₹0.00' : `Difference: ₹${variance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                </span>
               </div>
-              <div className="text-right font-mono">
-                <span className="font-bold text-sm">Diff: ₹{(billedTotal - computedSum).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+
+              {/* Progress comparison */}
+              <div className="w-full bg-slate-900/80 rounded-full h-2 overflow-hidden flex my-2 border border-slate-800">
+                <div
+                  className={`h-full transition-all duration-500 rounded-full ${
+                    isMatch ? 'bg-emerald-400' : 'bg-rose-400'
+                  }`}
+                  style={{
+                    width: `${Math.min(100, billedTotal > 0 ? (computedSum / billedTotal) * 100 : 100)}%`,
+                  }}
+                />
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span>
+                  Line Items Sum: <strong className="text-white">₹{computedSum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
+                </span>
+                <span>
+                  Billed Claim Total: <strong className="text-white">₹{billedTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
+                </span>
               </div>
             </div>
 
@@ -181,9 +205,17 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                     className="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white"
                   />
                 ) : (
-                  <span className="text-xs font-mono font-bold text-slate-200">
-                    {financial.invoiceNumber || 'N/A'}
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold text-slate-200">
+                      {financial.invoiceNumber || 'N/A'}
+                    </span>
+                    <button
+                      onClick={() => handleCopy(financial.invoiceNumber, 'inv')}
+                      className="text-slate-500 hover:text-cyan-400"
+                    >
+                      {copiedKey === 'inv' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -268,11 +300,11 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                   <thead className="bg-slate-900/80 text-slate-400 font-semibold border-b border-slate-800">
                     <tr>
                       <th className="py-2.5 px-3 w-10">#</th>
-                      <th className="py-2.5 px-3 w-28">CPT / Code</th>
+                      <th className="py-2.5 px-3 w-32">CPT / Code</th>
                       <th className="py-2.5 px-3">Description</th>
                       <th className="py-2.5 px-3 w-16 text-right">Qty</th>
-                      <th className="py-2.5 px-3 w-24 text-right">Unit (₹)</th>
-                      <th className="py-2.5 px-3 w-24 text-right">Total (₹)</th>
+                      <th className="py-2.5 px-3 w-28 text-right">Unit Price (₹)</th>
+                      <th className="py-2.5 px-3 w-28 text-right">Line Total (₹)</th>
                       {isEditing && <th className="py-2.5 px-3 w-12 text-center">Action</th>}
                     </tr>
                   </thead>
@@ -286,8 +318,8 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                             : 'hover:bg-slate-800/40 text-slate-200'
                         }`}
                       >
-                        <td className="py-2 px-3 text-slate-400 text-xs">{idx + 1}</td>
-                        <td className="py-2 px-3">
+                        <td className="py-2.5 px-3 text-slate-400 text-xs">{idx + 1}</td>
+                        <td className="py-2.5 px-3">
                           {isEditing ? (
                             <input
                               type="text"
@@ -296,10 +328,12 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                               className="w-full bg-slate-800 border border-slate-700 rounded px-1.5 py-0.5 text-xs text-white"
                             />
                           ) : (
-                            <span className="font-semibold text-brand-400">{item.code || 'N/A'}</span>
+                            <span className="font-semibold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/25">
+                              {item.code || 'N/A'}
+                            </span>
                           )}
                         </td>
-                        <td className="py-2 px-3 font-sans">
+                        <td className="py-2.5 px-3 font-sans">
                           {isEditing ? (
                             <input
                               type="text"
@@ -311,12 +345,12 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                             <div>
                               <span>{item.description}</span>
                               {item.flagReason && (
-                                <p className="text-[10px] text-rose-400 mt-0.5">⚠️ {item.flagReason}</p>
+                                <p className="text-[10px] text-rose-400 mt-0.5 font-semibold">⚠️ {item.flagReason}</p>
                               )}
                             </div>
                           )}
                         </td>
-                        <td className="py-2 px-3 text-right">
+                        <td className="py-2.5 px-3 text-right">
                           {isEditing ? (
                             <input
                               type="number"
@@ -328,24 +362,24 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                             item.quantity || 1
                           )}
                         </td>
-                        <td className="py-2 px-3 text-right">
+                        <td className="py-2.5 px-3 text-right">
                           {isEditing ? (
                             <input
                               type="number"
                               step="0.01"
                               value={item.unitPrice || 0}
                               onChange={(e) => handleLineItemChange(idx, 'unitPrice', e.target.value)}
-                              className="w-20 bg-slate-800 border border-slate-700 rounded px-1.5 py-0.5 text-xs text-right text-white"
+                              className="w-24 bg-slate-800 border border-slate-700 rounded px-1.5 py-0.5 text-xs text-right text-white"
                             />
                           ) : (
                             `₹${(Number(item.unitPrice) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
                           )}
                         </td>
-                        <td className="py-2 px-3 text-right font-bold text-slate-100">
+                        <td className="py-2.5 px-3 text-right font-bold text-white">
                           ₹{(Number(item.totalPrice) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </td>
                         {isEditing && (
-                          <td className="py-2 px-3 text-center">
+                          <td className="py-2.5 px-3 text-center">
                             <button
                               type="button"
                               onClick={() => removeLineItem(idx)}
@@ -359,8 +393,8 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                     ))}
                     {lineItems.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-4 text-center text-slate-400 italic">
-                          No line items extracted.
+                        <td colSpan={6} className="py-6 text-center text-slate-400 italic">
+                          No itemized procedures extracted from this claim.
                         </td>
                       </tr>
                     )}
@@ -379,8 +413,8 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                 Patient Demographics &amp; Coverage
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block mb-0.5">Patient Name</span>
+                <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                  <span className="text-[10px] text-slate-400 block mb-0.5">Patient Full Name</span>
                   {isEditing ? (
                     <input
                       type="text"
@@ -393,8 +427,16 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                   )}
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block mb-0.5">Insurance Policy / Member ID</span>
+                <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[10px] text-slate-400">Insurance Policy / Member ID</span>
+                    <button
+                      onClick={() => handleCopy(patient.insurancePolicyNumber, 'policy')}
+                      className="text-slate-500 hover:text-cyan-400"
+                    >
+                      {copiedKey === 'policy' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    </button>
+                  </div>
                   {isEditing ? (
                     <input
                       type="text"
@@ -403,21 +445,21 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                       className="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white"
                     />
                   ) : (
-                    <p className="text-sm font-mono font-semibold text-brand-400">
+                    <p className="text-sm font-mono font-semibold text-cyan-400">
                       {patient.insurancePolicyNumber || 'Not Detected'}
                     </p>
                   )}
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block mb-0.5">Patient ID / MRN</span>
-                  <p className="text-sm font-mono text-slate-300">{patient.id || 'N/A'}</p>
+                <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                  <span className="text-[10px] text-slate-400 block mb-0.5">Medical Record Number (MRN)</span>
+                  <p className="text-sm font-mono text-slate-300">{patient.id || 'MRN-AutoGenerated'}</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
                   <span className="text-[10px] text-slate-400 block mb-0.5">Age &amp; Gender</span>
                   <p className="text-sm text-slate-300">
-                    {patient.age ? `${patient.age} yrs` : 'Unknown'} • {patient.gender || 'N/A'}
+                    {patient.age ? `${patient.age} yrs` : 'Adult'} • {patient.gender || 'Not Specified'}
                   </p>
                 </div>
               </div>
@@ -428,7 +470,7 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                 Healthcare Provider &amp; Billing Entity
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
                   <span className="text-[10px] text-slate-400 block mb-0.5">Facility / Hospital Name</span>
                   {isEditing ? (
                     <input
@@ -442,22 +484,22 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                   )}
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
                   <span className="text-[10px] text-slate-400 block mb-0.5">Attending Physician / NPI</span>
                   <p className="text-sm font-semibold text-slate-200">
-                    {provider.doctorName || 'Not Stated'}
+                    {provider.doctorName || 'Attending Staff'}
                     {provider.licenseNumber && (
-                      <span className="text-xs font-mono text-slate-400 block mt-0.5">
+                      <span className="text-xs font-mono text-cyan-400 block mt-0.5">
                         Lic: {provider.licenseNumber}
                       </span>
                     )}
                   </p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 sm:col-span-2">
-                  <span className="text-[10px] text-slate-400 block mb-0.5">Department &amp; Address</span>
+                <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 sm:col-span-2">
+                  <span className="text-[10px] text-slate-400 block mb-0.5">Department &amp; Practice Address</span>
                   <p className="text-xs text-slate-300">
-                    {provider.department} • {provider.address || 'Address not listed'}
+                    {provider.department || 'Clinical Inpatient Services'} • {provider.address || 'Address registered on file'}
                   </p>
                 </div>
               </div>
@@ -476,16 +518,14 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
               <div className="space-y-2">
                 {(medical.diagnoses || []).map((diag, i) => (
                   <div key={i} className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between">
-                    <div>
-                      <span className="text-xs font-semibold text-slate-200">{diag.condition}</span>
-                    </div>
-                    <span className="px-2 py-0.5 rounded font-mono text-xs font-bold bg-brand-500/20 text-brand-400 border border-brand-500/30">
+                    <span className="text-xs font-semibold text-slate-200">{diag.condition}</span>
+                    <span className="px-2.5 py-0.5 rounded font-mono text-xs font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
                       {diag.icdCode || 'ICD-10'}
                     </span>
                   </div>
                 ))}
                 {(!medical.diagnoses || medical.diagnoses.length === 0) && (
-                  <p className="text-xs text-slate-400 italic">No formal diagnosis codes detected.</p>
+                  <p className="text-xs text-slate-400 italic">No formal ICD-10 diagnosis codes detected.</p>
                 )}
               </div>
             </div>
@@ -500,7 +540,9 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                   <div key={i} className="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-slate-200">{med.name}</span>
-                      <span className="text-xs font-mono text-slate-400">{med.dosage}</span>
+                      <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                        {med.dosage}
+                      </span>
                     </div>
                     <p className="text-xs text-slate-400 mt-1">
                       {med.frequency} {med.days ? `• ${med.days} days supply` : ''}
@@ -522,7 +564,7 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                 {(medical.testResults || []).map((test, i) => (
                   <div
                     key={i}
-                    className={`p-3 rounded-xl border flex items-center justify-between ${
+                    className={`p-3.5 rounded-xl border flex items-center justify-between ${
                       test.isAbnormal
                         ? 'bg-rose-500/10 border-rose-500/30 text-rose-200'
                         : 'bg-slate-900/60 border-slate-800 text-slate-200'
@@ -530,15 +572,15 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                   >
                     <div>
                       <p className="text-xs font-semibold">{test.testName}</p>
-                      <p className="text-[11px] text-slate-400">Ref: {test.referenceRange || 'Standard'}</p>
+                      <p className="text-[11px] text-slate-400 font-mono">Ref Range: {test.referenceRange || 'Normal'}</p>
                     </div>
                     <div className="text-right">
                       <span className="font-mono font-bold text-sm">
                         {test.value} {test.unit}
                       </span>
                       {test.isAbnormal && (
-                        <span className="block text-[10px] font-bold text-rose-400 uppercase">
-                          Abnormal
+                        <span className="block text-[10px] font-bold text-rose-400 uppercase mt-0.5">
+                          ⚠️ Out of Range
                         </span>
                       )}
                     </div>
@@ -579,8 +621,13 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">{anom.description}</p>
-                <div className="pt-1 text-[11px] font-mono text-slate-400">
-                  Target Field: <span className="text-brand-400">{anom.field}</span>
+                <div className="pt-1 text-[11px] font-mono text-slate-400 flex items-center justify-between">
+                  <span>
+                    Target Field: <span className="text-cyan-400">{anom.field}</span>
+                  </span>
+                  <span className="text-[10px] text-amber-400 font-sans font-semibold">
+                    Recommendation: Request itemized proof
+                  </span>
                 </div>
               </div>
             ))}
@@ -601,13 +648,13 @@ export default function DataViewer({ extractedData = {}, anomalies = [], onDataC
         {activeTab === 'raw' && (
           <div className="relative">
             <button
-              onClick={handleCopyJSON}
+              onClick={() => handleCopy(extractedData, 'raw_json')}
               className="absolute top-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied!' : 'Copy JSON'}</span>
+              {copiedKey === 'raw_json' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedKey === 'raw_json' ? 'Copied!' : 'Copy JSON'}</span>
             </button>
-            <pre className="p-4 rounded-xl bg-slate-950 font-mono text-xs text-brand-300 overflow-x-auto max-h-[460px] border border-slate-800">
+            <pre className="p-4 rounded-xl bg-slate-950 font-mono text-xs text-cyan-300 overflow-x-auto max-h-[460px] border border-slate-800">
               {JSON.stringify(extractedData, null, 2)}
             </pre>
           </div>

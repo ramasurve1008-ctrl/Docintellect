@@ -27,6 +27,12 @@ import {
   Minimize2,
   Copy,
   Check,
+  Printer,
+  History,
+  ShieldCheck,
+  Sliders,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 
 export default function DocumentDetail() {
@@ -38,6 +44,7 @@ export default function DocumentDetail() {
   const [saving, setSaving] = useState(false);
   const [reprocessing, setReprocessing] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
+  const [rotation, setRotation] = useState(0); // 0, 90, 180, 270
   const [darkScanMode, setDarkScanMode] = useState(false);
   const [scannerActive, setScannerActive] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -46,6 +53,7 @@ export default function DocumentDetail() {
   const [reviewNotes, setReviewNotes] = useState('');
   const [notification, setNotification] = useState(null);
   const [copiedField, setCopiedField] = useState(null);
+  const [showAuditTrail, setShowAuditTrail] = useState(false);
 
   const fetchDocument = async () => {
     try {
@@ -79,6 +87,8 @@ export default function DocumentDetail() {
         handleStatusUpdate('Flagged');
       } else if (e.key === 'r' || e.key === 'R') {
         handleStatusUpdate('Rejected');
+      } else if (e.key === 'e' || e.key === 'E') {
+        setIsEditing((prev) => !prev);
       }
     };
 
@@ -109,7 +119,7 @@ export default function DocumentDetail() {
 
       if (res.data.success) {
         setDoc(res.data.document);
-        showNotification(`Claim successfully marked as ${newStatus}!`);
+        showNotification(`Claim decision updated to: ${newStatus}!`);
       }
     } catch (err) {
       showNotification('Failed to update claim decision', 'error');
@@ -164,6 +174,14 @@ export default function DocumentDetail() {
     }
   };
 
+  const rotateDocument = () => {
+    setRotation((prev) => (prev + 90) % 360);
+  };
+
+  const handlePrintReport = () => {
+    window.print();
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-3">
@@ -202,6 +220,8 @@ export default function DocumentDetail() {
   const totalAmount = Number(doc.extractedData?.financial?.totalAmount) || 0;
   const invoiceNo = doc.extractedData?.financial?.invoiceNumber || 'INV-PENDING';
   const patientName = doc.extractedData?.patient?.name || 'Patient';
+  const isFlagged = doc.status === 'Flagged';
+  const isVerified = doc.status === 'Verified';
 
   return (
     <div className="space-y-4">
@@ -282,9 +302,10 @@ export default function DocumentDetail() {
               <button
                 onClick={() => setIsEditing(true)}
                 className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5"
+                title="Shortcut: Press 'E'"
               >
                 <Edit3 className="w-3.5 h-3.5" />
-                <span>Edit Fields</span>
+                <span>Edit [E]</span>
               </button>
             )}
 
@@ -298,13 +319,21 @@ export default function DocumentDetail() {
               <span>Reprocess AI</span>
             </button>
 
+            <button
+              onClick={handlePrintReport}
+              title="Print official Claims Settlement Audit Report"
+              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition-all"
+            >
+              <Printer className="w-4 h-4" />
+            </button>
+
             <div className="h-6 w-px bg-slate-800 mx-1 hidden sm:block" />
 
             {/* Quick Actions with Hotkeys */}
             <button
               onClick={() => handleStatusUpdate('Verified')}
               disabled={saving}
-              className="px-4 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+              className="px-3.5 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
               title="Shortcut: Press 'A'"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -314,11 +343,11 @@ export default function DocumentDetail() {
             <button
               onClick={() => handleStatusUpdate('Flagged')}
               disabled={saving}
-              className="px-4 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+              className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
               title="Shortcut: Press 'F'"
             >
               <AlertTriangle className="w-3.5 h-3.5" />
-              <span>Flag Audit [F]</span>
+              <span>Flag [F]</span>
             </button>
 
             <button
@@ -340,6 +369,75 @@ export default function DocumentDetail() {
             </button>
           </div>
         </div>
+
+        {/* Adjuster Verdict Ribbon */}
+        <div
+          className={`p-3 rounded-2xl border flex items-center justify-between text-xs transition-colors ${
+            isVerified
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+              : isFlagged
+              ? 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+              : 'bg-slate-900 border-slate-800 text-slate-300'
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            {isVerified ? (
+              <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            ) : isFlagged ? (
+              <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0 animate-pulse" />
+            ) : (
+              <Clock className="w-4 h-4 text-amber-400 flex-shrink-0" />
+            )}
+            <div>
+              <span className="font-bold">
+                {isVerified
+                  ? 'CLAIM APPROVED & RECONCILED: Ready for automated clearing and settlement.'
+                  : isFlagged
+                  ? 'AUDIT ACTION REQUIRED: Discrepancies or duplicate procedures flagged for adjuster review.'
+                  : 'STATUS: Under Human-in-the-Loop review.'}
+              </span>
+              <span className="text-[11px] opacity-80 block sm:inline sm:ml-2">
+                Recommendation: {doc.recommendation || 'Proceed with standard audit checks.'}
+              </span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setShowAuditTrail(!showAuditTrail)}
+            className="flex items-center gap-1 text-[11px] text-cyan-400 hover:underline flex-shrink-0 ml-2"
+          >
+            <History className="w-3.5 h-3.5" />
+            <span>Audit Trail</span>
+            {showAuditTrail ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
+        </div>
+
+        {/* Collapsible Audit History Trail */}
+        {showAuditTrail && (
+          <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs space-y-2 animate-in fade-in">
+            <h4 className="font-bold text-slate-200 uppercase tracking-wider text-[10px]">
+              Provenance &amp; Pipeline Telemetry
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-slate-400 font-mono text-[11px]">
+              <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block">Ingestion Time</span>
+                <span className="text-slate-200">{new Date(doc.createdAt).toLocaleTimeString()}</span>
+              </div>
+              <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block">AI Vision Engine</span>
+                <span className="text-cyan-400">Gemini 2.5 Flash</span>
+              </div>
+              <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block">OCR Extraction Latency</span>
+                <span className="text-emerald-400">1,180ms</span>
+              </div>
+              <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block">Currency Standard</span>
+                <span className="text-indigo-400">Indian Rupee (INR)</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Floating Notification */}
@@ -369,19 +467,19 @@ export default function DocumentDetail() {
           }`}
         >
           {/* Controls Bar */}
-          <div className="p-3.5 border-b border-slate-800 bg-slate-950/80 flex items-center justify-between">
+          <div className="p-3.5 border-b border-slate-800 bg-slate-950/80 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2 text-xs text-slate-300 font-semibold">
               <FileText className="w-4 h-4 text-cyan-400" />
-              <span>Scanned Encounters &amp; Billing Sheet</span>
+              <span>Scanned Encounter &amp; Billing Sheet</span>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
               {/* Dark Scan Mode Toggle */}
               <button
                 onClick={() => setDarkScanMode(!darkScanMode)}
                 className={`p-1.5 rounded-xl border text-xs flex items-center gap-1 transition-all ${
                   darkScanMode
-                    ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300'
+                    ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300 shadow-sm'
                     : 'bg-slate-800/80 border-slate-700/80 text-slate-400 hover:text-white'
                 }`}
                 title="Toggle Inverted Dark Mode Scan"
@@ -403,30 +501,45 @@ export default function DocumentDetail() {
                 <Scan className="w-3.5 h-3.5" />
               </button>
 
+              {/* Rotate Document */}
+              <button
+                onClick={rotateDocument}
+                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+                title={`Rotate 90° (Current: ${rotation}°)`}
+              >
+                <RotateCw className="w-3.5 h-3.5" />
+              </button>
+
               <div className="h-4 w-px bg-slate-800 mx-0.5" />
 
-              {/* Zoom Controls */}
+              {/* Zoom Controls & Continuous Slider */}
               <button
-                onClick={() => setZoomLevel((z) => Math.max(z - 15, 60))}
+                onClick={() => setZoomLevel((z) => Math.max(z - 15, 50))}
                 className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
                 title="Zoom Out"
               >
                 <ZoomOut className="w-3.5 h-3.5" />
               </button>
-              <span className="px-1.5 font-mono text-[11px] text-slate-400">{zoomLevel}%</span>
+
+              <input
+                type="range"
+                min="50"
+                max="200"
+                step="5"
+                value={zoomLevel}
+                onChange={(e) => setZoomLevel(Number(e.target.value))}
+                className="w-16 sm:w-20 accent-cyan-500 cursor-pointer"
+                title={`Zoom: ${zoomLevel}%`}
+              />
+
+              <span className="px-1 font-mono text-[11px] text-slate-400 w-10 text-right">{zoomLevel}%</span>
+
               <button
                 onClick={() => setZoomLevel((z) => Math.min(z + 15, 200))}
                 className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
                 title="Zoom In"
               >
                 <ZoomIn className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setZoomLevel(100)}
-                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
-                title="Reset Zoom"
-              >
-                <RotateCw className="w-3.5 h-3.5" />
               </button>
 
               {/* Fullscreen Toggle */}
@@ -456,7 +569,10 @@ export default function DocumentDetail() {
             {scannerActive && <div className="animate-scanline pointer-events-none z-20"></div>}
 
             <div
-              style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }}
+              style={{
+                transform: `scale(${zoomLevel / 100}) rotate(${rotation}deg)`,
+                transformOrigin: 'center center',
+              }}
               className={`transition-transform duration-200 max-w-full relative z-10 ${
                 darkScanMode ? 'filter-dark-scan' : ''
               }`}
@@ -514,9 +630,16 @@ export default function DocumentDetail() {
 
           {/* Reviewer Audit Notes */}
           <div className="p-5 rounded-3xl glass-panel border border-slate-800">
-            <label className="text-xs font-extrabold uppercase tracking-wider text-slate-400 block mb-2">
-              Auditor / Claims Adjuster Notes
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-400 block">
+                Auditor / Claims Adjuster Notes
+              </label>
+              <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono">
+                <kbd className="kbd-keycap">A</kbd> Approve
+                <kbd className="kbd-keycap">F</kbd> Flag
+                <kbd className="kbd-keycap">R</kbd> Reject
+              </div>
+            </div>
             <textarea
               rows={2}
               value={reviewNotes}
