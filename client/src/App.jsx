@@ -30,7 +30,7 @@ const ProtectedLayout = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0b0f19]">
+    <div className="min-h-screen flex flex-col bg-[#080c16]">
       <Navbar />
       <div className="flex flex-1">
         <Sidebar />
