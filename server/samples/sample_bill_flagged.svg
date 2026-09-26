@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1050" width="100%" height="100%">
+  <!-- Paper Background -->
+  <rect width="800" height="1050" fill="#ffffff"/>
+  <rect x="0" y="0" width="800" height="10" fill="#dc2626"/>
+
+  <!-- Hospital Branding -->
+  <g transform="translate(50, 45)">
+    <circle cx="28" cy="28" r="28" fill="#fee2e2"/>
+    <path d="M28 14 V42 M14 28 H42" stroke="#dc2626" stroke-width="6" stroke-linecap="round"/>
+    <text x="70" y="24" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#0f172a">MERCY REGIONAL TRAUMA HOSPITAL</text>
+    <text x="70" y="44" font-family="Arial, sans-serif" font-size="13" fill="#64748b">Trauma Care Center • 100 Medical Blvd, Houston, TX</text>
+    <text x="70" y="60" font-family="Arial, sans-serif" font-size="12" fill="#64748b">Phone: (800) 555-4921 • Lic #: MD-551029-TX</text>
+  </g>
+
+  <!-- Title & High Risk Alert Badge -->
+  <line x1="50" y1="125" x2="750" y2="125" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="50" y="160" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#991b1b">SURGICAL INPATIENT BILLING STATEMENT</text>
+  <rect x="540" y="140" width="210" height="30" rx="6" fill="#fef2f2" stroke="#f87171"/>
+  <text x="555" y="160" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#dc2626">⚠️ SUSPECTED DISCREPANCY</text>
+
+  <!-- Patient & Encounter Grid -->
+  <rect x="50" y="185" width="340" height="130" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="65" y="210" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#475569">PATIENT INFORMATION</text>
+  <text x="65" y="235" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Name:</tspan> Arthur Pendelton</text>
+  <text x="65" y="255" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Patient ID:</tspan> PAT-48209 (Age: 58, Male)</text>
+  <text x="65" y="275" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Insurance:</tspan> Cigna Choice Plan</text>
+  <text x="65" y="295" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Policy #:</tspan> POL-CIGNA-77291</text>
+
+  <rect x="410" y="185" width="340" height="130" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="425" y="210" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#475569">CLAIM IDENTIFIERS</text>
+  <text x="425" y="235" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Invoice #:</tspan> INV-MERCY-9921</text>
+  <text x="425" y="255" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Admission Date:</tspan> 2026-09-18</text>
+  <text x="425" y="275" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Discharge Date:</tspan> 2026-09-19</text>
+  <text x="425" y="295" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Lead Surgeon:</tspan> Dr. Evelyn Cross, MD</text>
+
+  <!-- Diagnosis Box -->
+  <rect x="50" y="330" width="700" height="50" rx="6" fill="#fef2f2" stroke="#fecaca"/>
+  <text x="65" y="352" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#b91c1c">ADMITTING DIAGNOSIS</text>
+  <text x="65" y="370" font-family="Arial, sans-serif" font-size="13" fill="#7f1d1d">• S72.001A - Fracture of neck of right femur, initial encounter</text>
+
+  <!-- Line Items Table -->
+  <rect x="50" y="400" width="700" height="35" rx="4" fill="#0f172a"/>
+  <text x="65" y="423" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#f8fafc">CODE</text>
+  <text x="160" y="423" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#f8fafc">PROCEDURE / DESCRIPTION</text>
+  <text x="530" y="423" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#f8fafc">QTY</text>
+  <text x="600" y="423" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#f8fafc">UNIT</text>
+  <text x="685" y="423" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#f8fafc">TOTAL</text>
+
+  <!-- Row 1 -->
+  <rect x="50" y="440" width="700" height="42" fill="#ffffff"/>
+  <text x="65" y="466" font-family="Arial, sans-serif" font-size="12" fill="#334155">CPT-27236</text>
+  <text x="160" y="466" font-family="Arial, sans-serif" font-size="13" fill="#0f172a">Open treatment of femoral fracture with intramedullary rod</text>
+  <text x="540" y="466" font-family="Arial, sans-serif" font-size="13" fill="#334155">1</text>
+  <text x="595" y="466" font-family="Arial, sans-serif" font-size="13" fill="#334155">₹3,200.00</text>
+  <text x="680" y="466" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#0f172a">₹3,200.00</text>
+  <line x1="50" y1="482" x2="750" y2="482" stroke="#f1f5f9"/>
+
+  <!-- Row 2 -->
+  <rect x="50" y="483" width="700" height="42" fill="#f8fafc"/>
+  <text x="65" y="509" font-family="Arial, sans-serif" font-size="12" fill="#334155">CPT-01210</text>
+  <text x="160" y="509" font-family="Arial, sans-serif" font-size="13" fill="#0f172a">Anesthesia for closed/open procedures on hip joint</text>
+  <text x="540" y="509" font-family="Arial, sans-serif" font-size="13" fill="#334155">1</text>
+  <text x="595" y="509" font-family="Arial, sans-serif" font-size="13" fill="#334155">₹1,000.00</text>
+  <text x="680" y="509" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#0f172a">₹1,000.00</text>
+  <line x1="50" y1="525" x2="750" y2="525" stroke="#f1f5f9"/>
+
+  <!-- Row 3 (Duplicate flagged!) -->
+  <rect x="50" y="526" width="700" height="45" fill="#fef2f2" stroke="#f87171" stroke-dasharray="4 4"/>
+  <text x="65" y="552" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#dc2626">CPT-01210</text>
+  <text x="160" y="552" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#dc2626">Duplicate Anesthesia Charge [DUPLICATE BILLING]</text>
+  <text x="540" y="552" font-family="Arial, sans-serif" font-size="13" fill="#dc2626">1</text>
+  <text x="595" y="552" font-family="Arial, sans-serif" font-size="13" fill="#dc2626">₹1,000.00</text>
+  <text x="680" y="552" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#dc2626">₹1,000.00</text>
+
+  <!-- Financial Box with Math Mismatch Highlight -->
+  <g transform="translate(420, 600)">
+    <rect width="330" height="210" rx="8" fill="#fef2f2" stroke="#f87171"/>
+    
+    <text x="20" y="30" font-family="Arial, sans-serif" font-size="13" fill="#64748b">Itemized Line Items Total:</text>
+    <text x="290" y="30" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="end">₹5,200.00</text>
+
+    <text x="20" y="60" font-family="Arial, sans-serif" font-size="13" fill="#64748b">Patient Co-Pay Deductible:</text>
+    <text x="290" y="60" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#64748b" text-anchor="end">-₹200.00</text>
+
+    <text x="20" y="90" font-family="Arial, sans-serif" font-size="13" fill="#64748b">Mathematical Expected Sum:</text>
+    <text x="290" y="90" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#15803d" text-anchor="end">₹5,000.00</text>
+
+    <line x1="15" y1="115" x2="315" y2="115" stroke="#f87171"/>
+
+    <text x="20" y="145" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#991b1b">BILLED CLAIM TOTAL:</text>
+    <text x="290" y="145" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#dc2626" text-anchor="end">₹5,850.00</text>
+
+    <rect x="20" y="165" width="290" height="30" rx="4" fill="#fee2e2"/>
+    <text x="28" y="185" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#991b1b">⚠️ ANOMALY: +₹850.00 Unaccounted Variance</text>
+  </g>
+
+  <!-- Attestation -->
+  <g transform="translate(50, 850)">
+    <line x1="0" y1="90" x2="260" y2="90" stroke="#0f172a" stroke-width="1.5"/>
+    <text x="0" y="110" font-family="'Brush Script MT', cursive, sans-serif" font-size="24" fill="#1e293b">Dr. Evelyn Cross, MD</text>
+    <text x="0" y="128" font-family="Arial, sans-serif" font-size="11" fill="#64748b">Department of Surgery • Lic #: MD-551029-TX</text>
+  </g>
+</svg>

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1050" width="100%" height="100%">
+  <rect width="800" height="1050" fill="#ffffff"/>
+  <rect x="0" y="0" width="800" height="12" fill="#059669"/>
+
+  <g transform="translate(60, 50)">
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#065f46">METROHEALTH ENDOCRINOLOGY CLINIC</text>
+    <text x="0" y="55" font-family="Arial, sans-serif" font-size="13" fill="#64748b">500 Central Avenue, Suite 4B, Boston, MA • Tel: (617) 555-8833</text>
+    <text x="0" y="75" font-family="Arial, sans-serif" font-size="12" fill="#64748b">Dr. Aris Thorne, M.D. • DEA: AT9823419 • NPI: 1092837482</text>
+  </g>
+
+  <line x1="60" y1="140" x2="740" y2="140" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <g transform="translate(60, 160)">
+    <rect width="680" height="85" rx="8" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <text x="25" y="30" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Patient Name:</tspan> Robert Langdon</text>
+    <text x="360" y="30" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Date of Birth:</tspan> 1974-06-12 (Age: 52)</text>
+    <text x="25" y="60" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Prescription Date:</tspan> 2026-09-22</text>
+    <text x="360" y="60" font-family="Arial, sans-serif" font-size="13" fill="#1e293b"><tspan font-weight="bold">Insurance / Policy:</tspan> Aetna • POL-AET-332190</text>
+  </g>
+
+  <!-- Big Rx Symbol -->
+  <g transform="translate(70, 290)">
+    <text x="0" y="70" font-family="'Times New Roman', serif" font-size="90" font-weight="bold" fill="#047857">℞</text>
+  </g>
+
+  <g transform="translate(180, 310)">
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#0f172a">HUMALOG (Insulin Lispro)</text>
+    <text x="0" y="55" font-family="Arial, sans-serif" font-size="14" fill="#334155">Strength: 100 units / mL (10 mL Vial)</text>
+    <text x="0" y="80" font-family="Arial, sans-serif" font-size="14" fill="#0f172a"><tspan font-weight="bold">Sig:</tspan> Inject subcutaneously per sliding scale protocol 15 minutes before meals.</text>
+    <text x="0" y="105" font-family="Arial, sans-serif" font-size="14" fill="#334155">Dispense: #2 (Two) 10mL Vials (30-day supply) • Refills: 3</text>
+    <text x="0" y="130" font-family="Arial, sans-serif" font-size="13" fill="#047857"><tspan font-weight="bold">ICD-10:</tspan> E10.9 (Type 1 Diabetes Mellitus)</text>
+  </g>
+
+  <rect x="60" y="520" width="680" height="120" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="80" y="550" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#334155">PHARMACY DISPENSING FINANCIAL RECONCILIATION</text>
+  <text x="80" y="580" font-family="Arial, sans-serif" font-size="13" fill="#64748b">Pharmacy NDC: 0002-8215-01 (U-100 Insulin Lispro)</text>
+  <text x="80" y="605" font-family="Arial, sans-serif" font-size="13" fill="#64748b">Total Drug Cost: ₹185.00  |  Copay: ₹25.00  |  Insurance Payer Share: ₹160.00</text>
+
+  <g transform="translate(60, 750)">
+    <line x1="0" y1="50" x2="300" y2="50" stroke="#0f172a" stroke-width="1.5"/>
+    <text x="0" y="80" font-family="'Brush Script MT', cursive, sans-serif" font-size="28" fill="#1e293b">Dr. Aris Thorne, MD</text>
+    <text x="0" y="105" font-family="Arial, sans-serif" font-size="11" fill="#64748b">Physician Signature • Dispense as Written</text>
+  </g>
+</svg>

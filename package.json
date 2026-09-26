@@ -1,0 +1,22 @@
+{
+  "name": "docintellect-idp-platform",
+  "version": "1.0.0",
+  "description": "Intelligent Document Processing (IDP) Solution for Medical Insurance Claims using Google Gemini API",
+  "scripts": {
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "install:all": "npm --prefix server install && npm --prefix client install"
+  },
+  "keywords": [
+    "intelligent-document-processing",
+    "idp",
+    "gemini-api",
+    "medical-claims",
+    "ocr",
+    "fraud-detection",
+    "react",
+    "express"
+  ],
+  "author": "DocIntellect Engineering Team",
+  "license": "MIT"
+}
