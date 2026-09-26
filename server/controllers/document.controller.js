@@ -4,6 +4,7 @@ import Document from '../models/Document.js';
 import { inMemoryStore } from '../services/store.service.js';
 import { processDocumentWithGemini } from '../services/ai.service.js';
 import { getDBStatus } from '../config/db.js';
+import { syncDocumentToSupabase } from '../config/supabase.js';
 
 export const uploadAndProcess = async (req, res) => {
   try {
@@ -59,6 +60,7 @@ export const uploadAndProcess = async (req, res) => {
     const isDbConnected = getDBStatus();
     if (isDbConnected) {
       const savedDoc = await Document.create(docPayload);
+      syncDocumentToSupabase(savedDoc).catch(() => {});
       return res.status(201).json({
         success: true,
         message: 'Document uploaded and processed successfully',
@@ -74,6 +76,7 @@ export const uploadAndProcess = async (req, res) => {
       updatedAt: new Date().toISOString(),
     };
     inMemoryStore.addDocument(memDoc);
+    syncDocumentToSupabase(memDoc).catch(() => {});
 
     return res.status(201).json({
       success: true,
@@ -183,6 +186,7 @@ export const updateDocumentData = async (req, res) => {
       if (!doc) {
         return res.status(404).json({ success: false, message: 'Document not found' });
       }
+      syncDocumentToSupabase(doc).catch(() => {});
       return res.json({ success: true, message: 'Document updated successfully', document: doc });
     }
 
@@ -190,6 +194,7 @@ export const updateDocumentData = async (req, res) => {
     if (!updated) {
       return res.status(404).json({ success: false, message: 'Document not found' });
     }
+    syncDocumentToSupabase(updated).catch(() => {});
 
     return res.json({ success: true, message: 'Document updated successfully', document: updated });
   } catch (error) {
@@ -216,6 +221,7 @@ export const updateDocumentStatus = async (req, res) => {
       if (!doc) {
         return res.status(404).json({ success: false, message: 'Document not found' });
       }
+      syncDocumentToSupabase(doc).catch(() => {});
       return res.json({ success: true, message: `Document marked as ${status}`, document: doc });
     }
 
@@ -223,6 +229,7 @@ export const updateDocumentStatus = async (req, res) => {
     if (!updated) {
       return res.status(404).json({ success: false, message: 'Document not found' });
     }
+    syncDocumentToSupabase(updated).catch(() => {});
 
     return res.json({ success: true, message: `Document marked as ${status}`, document: updated });
   } catch (error) {

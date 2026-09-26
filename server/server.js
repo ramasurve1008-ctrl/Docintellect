@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { connectDB } from './config/db.js';
+import { initSupabase, isSupabaseConnected } from './config/supabase.js';
 import authRoutes from './routes/auth.routes.js';
 import documentRoutes from './routes/document.routes.js';
 
@@ -20,6 +21,9 @@ const PORT = process.env.PORT || 5000;
 
 // Connect to Database (or activate resilient local fallback)
 connectDB();
+
+// Initialize Supabase Cloud Database & Storage
+initSupabase();
 
 // Ensure required public directories exist
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -54,6 +58,13 @@ app.get('/api/health', (req, res) => {
       provider: 'Google Gemini Vision & OCR',
       model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
       hasApiKey: Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your_gemini_api_key_here'),
+    },
+    database: {
+      mongo: Boolean(process.env.MONGO_URI),
+      supabase: {
+        configured: isSupabaseConnected(),
+        projectUrl: process.env.SUPABASE_URL || 'https://paoagkctoxjofhllitjd.supabase.co',
+      },
     },
   });
 });
